@@ -10,13 +10,13 @@ object Mima {
       .forall(c => c == '.' || c == '-' || c.isDigit)
 
   def binaryCompatibilityVersions: Set[String] =
-    Seq("git", "tag", "--merged", "HEAD^", "--contains", "v0.3.1")
+    Seq("git", "tag", "--merged", "HEAD^", "--contains", "v0.3.2-SNAPSHOT")
       .!!
       .linesIterator
       .map(_.trim)
       .filter(_.startsWith("v"))
       .map(_.stripPrefix("v"))
-      .filter(_ != "0.3.1") // Mima enabled right after it
+      .filter(_ != "v0.3.2-SNAPSHOT") // Mima enabled right after it
       .filter(stable)
       .toSet
 

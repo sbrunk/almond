@@ -11,18 +11,20 @@ git:
 before_install:
   - source scripts/website/setup-build-tools.sh
 sudo: required
+services:
+  - docker
 stages:
-  - name: test
-  - name: release
+#  - name: test
+#  - name: release
+#    if: tag IS present
+  - name: update-docker-images
     if: (branch = master AND type = push) OR (tag IS present)
-  - name: upload-launcher
-    if: tag IS present
-  - name: update-docker-images # after upload-launcher, that waited for the sync to Maven Central
-    if: tag IS present
-  - name: update-versioned-docs
-    if: tag IS present
-  - name: update-website
-    if: (branch = master AND type = push) OR (tag IS present)
+#  - name: upload-launcher
+#    if: tag IS present
+#  - name: update-versioned-docs
+#    if: tag IS present
+#  - name: update-website
+#    if: (branch = master AND type = push) OR (tag IS present)
 jobs:
   include:
   - env: VALIDATE_EXAMPLES=1 # unused from the script, just to know what the job does from the Travis UI
@@ -37,35 +39,35 @@ jobs:
       - python3.6 -V
       - pip3 -V
       - sudo pip3 install -r examples/requirements.txt
-    script: scripts/setup-and-validate-examples.sh
-  - scala: 2.11.12
-  - scala: 2.12.6
-  - scala: 2.12.7
-  - scala: 2.12.8
-  - scala: 2.12.8
+#    script: scripts/setup-and-validate-examples.sh
+#  - scala: 2.11.12
+#  - scala: 2.12.6
+#  - scala: 2.12.7
+#  - scala: 2.12.8
+#  - scala: 2.12.8
     jdk: openjdk11
-  - name: "Website"
-    script: amm scripts/site.sc --publishLocal true
-  - stage: release
-    script: sbt ci-release
-  - stage: upload-launcher
-    name: "Upload launcher"
-    script: scripts/upload-launcher.sh
+#  - name: "Website"
+#    script: amm scripts/site.sc --publishLocal true
+#  - stage: release
+#    script: sbt ci-release
+#  - stage: upload-launcher
+#    name: "Upload launcher"
+#    script: scripts/upload-launcher.sh
   - stage: update-docker-images
     name: "Update docker images"
     script: scripts/update-docker-images.sh
-  - stage: update-versioned-docs
-    env: WEBSITE_DIR=docs/website VERSIONED_DOCS_REPO=almond-sh/versioned-docs
-    script:
-      - amm scripts/site.sc --publishLocal true --npmInstall true --yarnRunBuild true
-      - scripts/website/versioned-docs.sh --update
-  - stage: update-website
-    env: WEBSITE_DIR=docs/website REPO=almond-sh/almond VERSIONED_DOCS_REPO=almond-sh/versioned-docs
-    name: "Push website"
-    script:
-      - scripts/website/versioned-docs.sh
-      - amm scripts/site.sc --publishLocal true --npmInstall true --yarnRunBuild true --relativize true
-      - scripts/website/push-website.sh
+#  - stage: update-versioned-docs
+#    env: WEBSITE_DIR=docs/website VERSIONED_DOCS_REPO=almond-sh/versioned-docs
+#    script:
+#      - amm scripts/site.sc --publishLocal true --npmInstall true --yarnRunBuild true
+#      - scripts/website/versioned-docs.sh --update
+#  - stage: update-website
+#    env: WEBSITE_DIR=docs/website REPO=almond-sh/almond VERSIONED_DOCS_REPO=almond-sh/versioned-docs
+#    name: "Push website"
+#    script:
+#      - scripts/website/versioned-docs.sh
+#      - amm scripts/site.sc --publishLocal true --npmInstall true --yarnRunBuild true --relativize true
+#      - scripts/website/push-website.sh
 branches:
   only:
   - master
